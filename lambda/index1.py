@@ -7,7 +7,7 @@ def handler(event, context):
     
     # Build response
     response_body = {
-        "message": "Hello from Python Lambda!",
+        "message": "Hello from index2",
         "environment": environment,
         "path": event.get('rawPath', '/'),
         "method": event.get('requestContext', {}).get('http', {}).get('method', 'UNKNOWN')

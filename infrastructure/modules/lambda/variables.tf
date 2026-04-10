@@ -36,7 +36,6 @@ variable "lambda_zip_file" {
 variable "environment" {
     description = "Environment name (e.g., production, staging, development)"
     type        = string
-    default     = "production"
 }
 
 variable "log_level" {
@@ -48,5 +47,4 @@ variable "log_level" {
 variable "application_name" {
     description = "Name of the application"
     type        = string
-    default     = "example"
 }

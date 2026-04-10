@@ -16,30 +16,30 @@ data "aws_iam_policy_document" "assume_role" {
     }
 }
 
-resource "aws_iam_role" "example" {
+resource "aws_iam_role" "lambda_func_iam_role" {
     name               = "${var.lambda_function_name}_execution_role"
     assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-    role       = aws_iam_role.example.name
+    role       = aws_iam_role.lambda_func_iam_role.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 # Package the Lambda function code
-data "archive_file" "example" {
+data "archive_file" "lambda_func_file" {
     type        = "zip"
     source_file = "${var.lambda_source_file}"
     output_path = "${var.lambda_zip_file}"
 }
 
 # Lambda function
-resource "aws_lambda_function" "example" {
-    filename         = data.archive_file.example.output_path
+resource "aws_lambda_function" "lambda_func" {
+    filename         = data.archive_file.lambda_func_file.output_path
     function_name    = "${var.lambda_function_name}_${var.environment}"
-    role             = aws_iam_role.example.arn
+    role             = aws_iam_role.lambda_func_iam_role.arn
     handler          = var.lambda_handler
-    source_code_hash = data.archive_file.example.output_base64sha256
+    source_code_hash = data.archive_file.lambda_func_file.output_base64sha256
 
     runtime = var.lambda_runtime
 
@@ -57,8 +57,8 @@ resource "aws_lambda_function" "example" {
 }
 
 # Lambda Function URL (provides HTTP endpoint)
-resource "aws_lambda_function_url" "example" {
-    function_name      = aws_lambda_function.example.function_name
+resource "aws_lambda_function_url" "lambda_func_url" {
+    function_name      = aws_lambda_function.lambda_func.function_name
     authorization_type = "NONE"
 
     cors {
@@ -74,7 +74,7 @@ resource "aws_lambda_function_url" "example" {
 resource "aws_lambda_permission" "function_url" {
     statement_id           = "FunctionURLAllowPublicAccess"
     action                 = "lambda:InvokeFunctionUrl"
-    function_name          = aws_lambda_function.example.function_name
+    function_name          = aws_lambda_function.lambda_func.function_name
     principal              = "*"
     function_url_auth_type = "NONE"
 }
@@ -82,7 +82,7 @@ resource "aws_lambda_permission" "function_url" {
 resource "aws_lambda_permission" "function_url_invoke" {
     statement_id              = "FunctionURLAllowInvokeFunction"
     action                    = "lambda:InvokeFunction"
-    function_name             = aws_lambda_function.example.function_name
+    function_name             = aws_lambda_function.lambda_func.function_name
     principal                 = "*"
     
 }
