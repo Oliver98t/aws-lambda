@@ -26,11 +26,30 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# Package the Lambda function code
+# Build the Lambda package directory with Python dependencies.
+resource "null_resource" "lambda_build" {
+    triggers = {
+        source_hash       = filebase64sha256(var.lambda_source_file)
+        requirements_hash = filebase64sha256(var.lambda_requirements_file)
+    }
+    
+    provisioner "local-exec" {
+        command = <<-EOT
+            rm -rf "${var.lambda_build_dir}"
+            mkdir -p "${var.lambda_build_dir}"
+            python3 -m pip install -r "${var.lambda_requirements_file}" -t "${var.lambda_build_dir}"
+            cp "${var.lambda_source_file}" "${var.lambda_build_dir}/$(basename "${var.lambda_source_file}")"
+        EOT
+    }
+}
+
+# Package the Lambda function code and installed dependencies.
 data "archive_file" "lambda_func_file" {
     type        = "zip"
-    source_file = "${var.lambda_source_file}"
+    source_dir  = "${var.lambda_build_dir}"
     output_path = "${var.lambda_zip_file}"
+
+    depends_on = [null_resource.lambda_build]
 }
     
 # Lambda function

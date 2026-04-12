@@ -27,6 +27,18 @@ variable "lambda_source_file" {
     default     = "lambda/index.py"
 }
 
+variable "lambda_requirements_file" {
+    description = "Path to the Lambda requirements file"
+    type        = string
+    default     = "lambda/requirements.txt"
+}
+
+variable "lambda_build_dir" {
+    description = "Path to the temporary Lambda build directory"
+    type        = string
+    default     = "lambda/build"
+}
+
 variable "lambda_zip_file" {
 	description = "Path to the Lambda ZIP file"
 	type        = string
