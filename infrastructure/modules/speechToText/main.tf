@@ -28,7 +28,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 
 resource "aws_s3_bucket" "lambda_bucket" {
     bucket        = "${lower(var.application_name)}upload-${var.environment}"
-    force_destroy = false
+    force_destroy = true
 
     tags = {
         Environment = var.environment
