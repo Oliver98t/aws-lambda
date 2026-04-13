@@ -36,6 +36,20 @@ resource "aws_s3_bucket" "lambda_bucket" {
     }
 }
 
+locals {
+    test_flac_path = "${path.module}/fixtures/test.flac"
+}
+
+resource "aws_s3_object" "test_flac" {
+    count = fileexists(local.test_flac_path) ? 1 : 0
+
+    bucket       = aws_s3_bucket.lambda_bucket.id
+    key          = "uploads/test.flac"
+    source       = local.test_flac_path
+    etag         = filemd5(local.test_flac_path)
+    content_type = "audio/flac"
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "transcribe_bucket_access" {
