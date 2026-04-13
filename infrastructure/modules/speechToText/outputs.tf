@@ -46,3 +46,14 @@ output "lambda_function_url" {
     description = "The HTTP(S) URL endpoint for the Lambda function"
     value       = aws_lambda_function_url.lambda_func_url.function_url
 }
+
+# S3 Bucket Outputs
+output "lambda_s3_bucket_name" {
+    description = "Name of the S3 bucket created for the Lambda module"
+    value       = aws_s3_bucket.lambda_bucket.bucket
+}
+
+output "lambda_s3_bucket_arn" {
+    description = "ARN of the S3 bucket created for the Lambda module"
+    value       = aws_s3_bucket.lambda_bucket.arn
+}

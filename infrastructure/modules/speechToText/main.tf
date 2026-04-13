@@ -17,13 +17,129 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "lambda_func_iam_role" {
-    name               = "${var.lambda_function_name}_execution_role"
+    name               = "${var.lambda_function_name}_${var.environment}_execution_role"
     assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
     role       = aws_iam_role.lambda_func_iam_role.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_s3_bucket" "lambda_bucket" {
+    bucket        = "${lower(var.application_name)}upload-${var.environment}"
+    force_destroy = false
+
+    tags = {
+        Environment = var.environment
+        Application = var.application_name
+    }
+}
+
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "transcribe_bucket_access" {
+    statement {
+        sid    = "AllowTranscribePutObject"
+        effect = "Allow"
+
+        principals {
+            type        = "Service"
+            identifiers = ["transcribe.amazonaws.com"]
+        }
+
+        actions = ["s3:PutObject"]
+        resources = ["${aws_s3_bucket.lambda_bucket.arn}/*"]
+
+        condition {
+            test     = "StringEquals"
+            variable = "aws:SourceAccount"
+            values   = [data.aws_caller_identity.current.account_id]
+        }
+
+        condition {
+            test     = "ArnLike"
+            variable = "aws:SourceArn"
+            values   = ["arn:aws:transcribe:${var.aws_region}:${data.aws_caller_identity.current.account_id}:transcription-job/*"]
+        }
+    }
+
+    statement {
+        sid    = "AllowTranscribeGetBucketLocation"
+        effect = "Allow"
+
+        principals {
+            type        = "Service"
+            identifiers = ["transcribe.amazonaws.com"]
+        }
+
+        actions   = ["s3:GetBucketLocation", "s3:ListBucket"]
+        resources = [aws_s3_bucket.lambda_bucket.arn]
+
+        condition {
+            test     = "StringEquals"
+            variable = "aws:SourceAccount"
+            values   = [data.aws_caller_identity.current.account_id]
+        }
+
+        condition {
+            test     = "ArnLike"
+            variable = "aws:SourceArn"
+            values   = ["arn:aws:transcribe:${var.aws_region}:${data.aws_caller_identity.current.account_id}:transcription-job/*"]
+        }
+    }
+}
+
+resource "aws_s3_bucket_policy" "transcribe_bucket_access" {
+    bucket = aws_s3_bucket.lambda_bucket.id
+    policy = data.aws_iam_policy_document.transcribe_bucket_access.json
+}
+
+data "aws_iam_policy_document" "lambda_s3_access" {
+    statement {
+        effect = "Allow"
+        actions = [
+            "s3:GetObject",
+            "s3:PutObject",
+            "s3:DeleteObject"
+        ]
+        resources = ["${aws_s3_bucket.lambda_bucket.arn}/*"]
+    }
+
+    statement {
+        effect = "Allow"
+        actions = [
+            "s3:ListBucket"
+        ]
+        resources = [aws_s3_bucket.lambda_bucket.arn]
+    }
+}
+
+resource "aws_iam_role_policy" "lambda_s3_access" {
+    name   = "${var.lambda_function_name}_${var.environment}_s3_access"
+    role   = aws_iam_role.lambda_func_iam_role.id
+    policy = data.aws_iam_policy_document.lambda_s3_access.json
+}
+
+data "aws_iam_policy_document" "lambda_transcribe_access" {
+    statement {
+        effect = "Allow"
+        actions = [
+            "transcribe:StartTranscriptionJob",
+            "transcribe:GetTranscriptionJob",
+            "transcribe:ListTranscriptionJobs",
+            "transcribe:DeleteTranscriptionJob"
+        ]
+        resources = [
+            "arn:aws:transcribe:${var.aws_region}:*:transcription-job/*"
+        ]
+    }
+}
+
+resource "aws_iam_role_policy" "lambda_transcribe_access" {
+    name   = "${var.lambda_function_name}_${var.environment}_transcribe_access"
+    role   = aws_iam_role.lambda_func_iam_role.id
+    policy = data.aws_iam_policy_document.lambda_transcribe_access.json
 }
 
 # Build the Lambda package directory with Python dependencies.
@@ -61,11 +177,13 @@ resource "aws_lambda_function" "lambda_func" {
     source_code_hash = data.archive_file.lambda_func_file.output_base64sha256
 
     runtime = var.lambda_runtime
+    timeout = 60
 
     environment {
         variables = {
             ENVIRONMENT = var.environment
             LOG_LEVEL   = var.log_level
+            S3_BUCKET   = aws_s3_bucket.lambda_bucket.bucket
         }
     }
 

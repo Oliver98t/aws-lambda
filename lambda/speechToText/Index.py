@@ -13,18 +13,18 @@ s3 = boto3.client('s3')
 sqs: SQSClient = boto3.client('sqs')
 
 def handler(event: dict, context):
-    '''
     query_parameters: dict = event.get('queryStringParameters')
-    print(query_parameters)
     user = query_parameters.get("user")
     transcription = None
     status = "FAIL"
-    if query_parameters and user:
+    if user:
         status = "SUCCESS"
         print(f"USER: {user}")
-        transcribe = Transcribe(bucket="ainterviewupload", user="test")
+        transcribe = Transcribe(bucket=os.environ['S3_BUCKET'], user="test")
         transcription = transcribe.transcribe()
+    '''
         queue_url = os.environ['SQSQUEUE1_QUEUE_URL']
+
         sqs.send_message(
             QueueUrl=queue_url,
             MessageBody=json.dumps({
@@ -33,7 +33,7 @@ def handler(event: dict, context):
     '''
     return {
         'statusCode': 200,
-        'body': "test"#json.dumps(f"Message: {transcription}")
+        'body': json.dumps(f"Message: {transcription}")
     }
 
 class Transcribe:
