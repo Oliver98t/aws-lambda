@@ -26,6 +26,25 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+data "aws_iam_policy_document" "lambda_sqs_consume_access" {
+    statement {
+        effect = "Allow"
+        actions = [
+            "sqs:ReceiveMessage",
+            "sqs:DeleteMessage",
+            "sqs:GetQueueAttributes",
+            "sqs:ChangeMessageVisibility"
+        ]
+        resources = [var.queue_arn]
+    }
+}
+
+resource "aws_iam_role_policy" "lambda_sqs_consume_access" {
+    name   = "${var.lambda_function_name}_${var.environment}_sqs_consume_access"
+    role   = aws_iam_role.lambda_func_iam_role.id
+    policy = data.aws_iam_policy_document.lambda_sqs_consume_access.json
+}
+
 # Build the Lambda package directory with Python dependencies.
 resource "null_resource" "lambda_build" {
     triggers = {
@@ -70,16 +89,9 @@ resource "aws_lambda_function" "lambda_func" {
     }
 }
 
-# Lambda Function URL (provides HTTP endpoint)
-resource "aws_lambda_function_url" "lambda_func_url" {
-    function_name      = aws_lambda_function.lambda_func.function_name
-    authorization_type = "AWS_IAM"
-
-    cors {
-        allow_credentials = false
-        allow_origins     = ["*"]
-        allow_methods     = ["GET", "POST"]
-        allow_headers     = ["*"]
-        max_age           = 86400
-    }
+resource "aws_lambda_event_source_mapping" "sqs_trigger" {
+    event_source_arn = var.queue_arn
+    function_name    = aws_lambda_function.lambda_func.arn
+    batch_size       = var.sqs_batch_size
+    enabled          = true
 }

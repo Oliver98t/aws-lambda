@@ -1,5 +1,6 @@
-# TODO connect lambda functions via queue
+# add bedrock stuff to response module
 # TODO create a way to test each lambda function locally
+# TODO dockerize
 # TODO create a folder structure for each lambda 
 import json
 import boto3

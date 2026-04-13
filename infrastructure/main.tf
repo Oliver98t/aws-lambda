@@ -34,4 +34,5 @@ module "response_lambda_function"  {
   lambda_zip_file           = "${path.module}/../lambda/response/build/zip/package.zip"
   environment               = var.environment
   application_name          = var.application_name
+  queue_arn                 = module.lambda_queue.queue_arn
 }
