@@ -68,6 +68,43 @@ resource "aws_iam_role_policy" "lambda_bedrock_access" {
     policy = data.aws_iam_policy_document.lambda_bedrock_access.json
 }
 
+resource "aws_dynamodb_table" "response_table" {
+    name         = "${lower(var.application_name)}-response-${var.environment}"
+    billing_mode = "PAY_PER_REQUEST"
+    hash_key     = "id"
+
+    attribute {
+        name = "id"
+        type = "S"
+    }
+
+    tags = {
+        Environment = var.environment
+        Application = var.application_name
+    }
+}
+
+data "aws_iam_policy_document" "lambda_dynamodb_access" {
+    statement {
+        effect = "Allow"
+        actions = [
+            "dynamodb:PutItem",
+            "dynamodb:GetItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem",
+            "dynamodb:Query",
+            "dynamodb:Scan"
+        ]
+        resources = [aws_dynamodb_table.response_table.arn]
+    }
+}
+
+resource "aws_iam_role_policy" "lambda_dynamodb_access" {
+    name   = "${var.lambda_function_name}_${var.environment}_dynamodb_access"
+    role   = aws_iam_role.lambda_func_iam_role.id
+    policy = data.aws_iam_policy_document.lambda_dynamodb_access.json
+}
+
 # Build the Lambda package directory with Python dependencies.
 resource "null_resource" "lambda_build" {
     triggers = {
@@ -108,6 +145,8 @@ resource "aws_lambda_function" "lambda_func" {
     environment {
         variables = {
             ENVIRONMENT = var.environment
+            LOCAL_TEST  = var.local_test
+            TABLE_NAME  = aws_dynamodb_table.response_table.name
         }
     }
 }

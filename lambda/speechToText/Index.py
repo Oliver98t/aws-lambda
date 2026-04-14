@@ -1,4 +1,3 @@
-# TODO add dynamodb db to response
 # TODO create a way to test each lambda function locally
 # TODO dockerize
 # TODO create simple pipeline 

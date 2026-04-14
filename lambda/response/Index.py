@@ -7,6 +7,8 @@ from mypy_boto3_bedrock_runtime import BedrockRuntimeClient
 
 # create the DynamoDB resource
 dynamo = boto3.client('dynamodb')
+LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
+TABLENAME = os.environ['TABLE_NAME']
 
 def handler(event, context):
     # get the message out of the SQS event
@@ -18,14 +20,14 @@ def handler(event, context):
     transcript = data.get('transcription')
     response = generate_response(transcript)
 
-    if os.environ.get('LOCAL_TEST', None) != None:
-        tablename = os.environ['TABLE_TABLE_NAME']
+    if LOCAL_TEST != None:
         dynamo.put_item(
-            TableName=tablename,
+            TableName=TABLENAME,
             Item={
                 'id': {'S': str(uuid.uuid4())},
                 'timestamp': {'S': datetime.datetime.now().isoformat()},
-                #'transcript': {'N': str(transcript)}
+                'transcript': {'S': str(transcript)},
+                'response': {'S': str(response)}
             }
         )
     else:
