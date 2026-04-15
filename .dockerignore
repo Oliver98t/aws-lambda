@@ -1,0 +1,30 @@
+# Ignore Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+.env/
+
+# Ignore Lambda build outputs
+LambdaSrc/*/build/
+
+# Ignore Terraform state and backup files
+infrastructure/*.tfstate
+infrastructure/*.tfstate.backup
+
+# Ignore test outputs
+LambdaSrc/*/test/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore Docker files (except Dockerfile itself)
+docker-compose.yml
+.dockerignore

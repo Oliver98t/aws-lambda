@@ -1,0 +1,11 @@
+services:
+  dev:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9000:8080"
+    volumes:
+      - .:/app
+      - ~/.aws:/root/.aws:ro
