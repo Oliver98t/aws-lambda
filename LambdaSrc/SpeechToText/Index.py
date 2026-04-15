@@ -80,6 +80,3 @@ class Transcribe:
     def transcribe(self):
         job_name = self.start_transcription()
         return self.get_transcription(job_name)
-
-if __name__ == "__main__":
-    Transcribe(bucket="ainterviewupload", user="test").transcribe()

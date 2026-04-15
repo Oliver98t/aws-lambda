@@ -49,7 +49,3 @@ def generate_response(prompt: str):
     )  
 
     return response["output"]["message"]["content"][0]["text"]
-
-if __name__ == "__main__":
-
-    print(generate_response("hello there"))
