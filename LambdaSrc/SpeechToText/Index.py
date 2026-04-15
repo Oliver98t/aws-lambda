@@ -1,4 +1,3 @@
-# TODO create a way to test each lambda function locally
 #  dockerize
     # TODO add dev container
     # TODO add production containers
