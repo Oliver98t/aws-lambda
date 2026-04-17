@@ -1,3 +1,7 @@
+resource "aws_ecr_repository" "ECR" {
+  name = "ecr-${var.environment}"
+}
+
 module "speech_to_text_lambda_function"  {
   source = "./modules/SpeechToText"
 
