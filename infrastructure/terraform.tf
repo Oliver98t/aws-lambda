@@ -6,4 +6,11 @@ terraform {
     }
   }
   required_version = ">= 1.2"
+  # values loaded in using backend.config
+  backend "s3" {
+    bucket         = ""
+    key            = ""
+    region         = ""
+    encrypt        = true
+  }
 }
