@@ -105,6 +105,10 @@ resource "aws_iam_role_policy" "lambda_dynamodb_access" {
     policy = data.aws_iam_policy_document.lambda_dynamodb_access.json
 }
 
+resource "aws_ecr_repository" "ECR" {
+  name = "${lower(var.lambda_function_name)}-${var.environment}"
+}
+
 # Build the Lambda package directory with Python dependencies.
 resource "null_resource" "lambda_build" {
     triggers = {
