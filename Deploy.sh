@@ -8,8 +8,10 @@ commit=$(git rev-parse --short HEAD)
 aws ecr get-login-password --region eu-west-2 | docker login --username AWS \
 --password-stdin $registry_url
 
-# remove old docker images locally
-docker rmi $(docker images | grep -E "response|speechtotext" | awk '{print $2}') --force
+if [ "$1" = "local" ]; then
+    echo "removing old images"
+    docker rmi $(docker images | grep -E "response|speechtotext" | awk '{print $2}') --force
+fi
 
 # build/tag/push Response
 response_tag="response-$env:$commit"

@@ -1,9 +1,8 @@
 name: Deploy
 
 on:
-    workflow_call:
     push:
-        branches: [ "*" ]
+        branches: [ "main" ]
 
 jobs:
     Deployment:
