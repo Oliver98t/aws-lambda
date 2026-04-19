@@ -28,5 +28,8 @@ docker tag $speechtotext_tag $speechtotext_image_uri
 docker push $registry_url/$speechtotext_tag
 
 cd infrastructure
-terraform plan -var="environment=$env" -var="Response_image_uri=$response_image_uri" -var="SpeechToText_image_uri=$speechtotext_image_uri" -var="aws_region=$region"
-cd ..
+terraform apply -auto-approve \
+    -var="environment=$env" \
+    -var="Response_image_uri=$response_image_uri" \
+    -var="SpeechToText_image_uri=$speechtotext_image_uri" \
+    -var="aws_region=$region"
