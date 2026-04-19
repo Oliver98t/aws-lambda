@@ -35,4 +35,4 @@ jobs:
               run: pytest
 
             - name: Deploy containers
-              run: source DeployContainers.sh
+              run: source Deploy.sh
