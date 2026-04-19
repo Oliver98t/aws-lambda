@@ -1,6 +1,3 @@
-#  dockerize
-    # TODO add production containers
-    # TODO modify terraform for using containers
 # TODO create simple pipeline 
 
 import json

@@ -9,40 +9,9 @@ variable "lambda_function_name" {
     type        = string
 }
 
-variable "lambda_runtime" {
-    description = "Runtime for the Lambda function"
+variable "lambda_function_image_uri" {
+    description = "Name of the Lambda function"
     type        = string
-    default     = "python3.12"
-}
-
-variable "lambda_handler" {
-    description = "Handler for the Lambda function"
-    type        = string
-    default     = "index.handler"
-}
-
-variable "lambda_source_file" {
-    description = "Path to the Lambda source code file"
-    type        = string
-    default     = "lambda/index.py"
-}
-
-variable "lambda_requirements_file" {
-    description = "Path to the Lambda requirements file"
-    type        = string
-    default     = "lambda/requirements.txt"
-}
-
-variable "lambda_build_dir" {
-    description = "Path to the temporary Lambda build directory"
-    type        = string
-    default     = "lambda/build"
-}
-
-variable "lambda_zip_file" {
-    description = "Path to the Lambda ZIP file"
-    type        = string
-    default     = "lambda/function.zip"
 }
 
 variable "environment" {

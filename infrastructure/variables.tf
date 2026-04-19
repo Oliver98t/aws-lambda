@@ -4,13 +4,23 @@ variable "aws_region" {
 	default     = "eu-west-2"
 }
 
+variable "application_name" {
+	description = "Name of the application"
+	type        = string
+	default     = "AInterview"
+}
+
 variable "environment" {
 	description = "Environment name (e.g., production, staging, development)"
 	type        = string
 }
 
-variable "application_name" {
+variable "Response_image_uri" {
 	description = "Name of the application"
 	type        = string
-	default     = "AInterview"
+}
+
+variable "SpeechToText_image_uri" {
+	description = "Name of the application"
+	type        = string
 }
