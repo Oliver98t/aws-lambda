@@ -1,5 +1,4 @@
 #!/bin/bash
-
 env="dev"
 account_id=$(aws sts get-caller-identity --query "Account" --output text)
 region=$(aws configure get region)
