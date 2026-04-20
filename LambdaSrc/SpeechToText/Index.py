@@ -4,6 +4,11 @@ import os
 from mypy_boto3_sqs import SQSClient
 import uuid
 
+# set up logging
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 # set up boto3 sdk
 transcribe = boto3.client('transcribe')
 s3 = boto3.client('s3')
@@ -12,9 +17,10 @@ sqs: SQSClient = boto3.client('sqs')
 # set up env variables
 LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 S3_BUCKET = os.environ.get('S3_BUCKET', None)
+logger.info(f"S3 bucket: {S3_BUCKET}")
 
 def handler(event: dict, context):
-    print(f"Event: {event}")
+    logger.info(f"Event: {event}")
     query_parameters: dict = event.get('queryStringParameters')
     user = query_parameters.get("user")
     transcribe = Transcribe(bucket=S3_BUCKET, user=user)

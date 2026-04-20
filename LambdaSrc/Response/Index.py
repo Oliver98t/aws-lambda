@@ -5,12 +5,16 @@ import json
 import uuid
 from mypy_boto3_bedrock_runtime import BedrockRuntimeClient
 
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 # create the DynamoDB resource
 dynamo = boto3.client('dynamodb')
 LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 
 def handler(event, context):
-    print(f"Event: {event}")
+    logger.info(f"Event: {event}")
     # get the message out of the SQS event
     message = event['Records'][0]['body']
     data: dict = json.loads(message)
