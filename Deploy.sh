@@ -29,7 +29,7 @@ docker push $registry_url/$speechtotext_tag
 
 cd infrastructure
 terraform init -reconfigure -backend-config=backend_$env.config
-terraform apply  \
+terraform apply -auto-approve \
     -var="environment=$env" \
     -var="Response_image_uri=$response_image_uri" \
     -var="SpeechToText_image_uri=$speechtotext_image_uri" \
