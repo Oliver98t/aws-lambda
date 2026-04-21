@@ -40,7 +40,7 @@ jobs:
               uses: hashicorp/setup-terraform@v3
 
             - name: Deploy dev environment
-              run: source deploy.sh dev
+              run: source deploy.sh dev auto-yes
 
             - name: Integration test
               run: pytest lambda_src/integration_test/
