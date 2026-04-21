@@ -15,12 +15,12 @@ variable "environment" {
 	type        = string
 }
 
-variable "Response_image_uri" {
+variable "response_image_uri" {
 	description = "Name of the application"
 	type        = string
 }
 
-variable "SpeechToText_image_uri" {
+variable "speech_to_text_image_uri" {
 	description = "Name of the application"
 	type        = string
 }

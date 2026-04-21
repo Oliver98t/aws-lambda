@@ -4,18 +4,18 @@ This repository contains the backend infrastructure and Lambda source code for t
 
 ## Project Structure
 
-- **Deploy.sh**: Bash script to build, tag, and push Lambda container images to AWS ECR and deploy infrastructure using Terraform.
+- **deploy.sh**: Bash script to build, tag, and push Lambda container images to AWS ECR and deploy infrastructure using Terraform.
 - **Dockerfile**: Builds a development environment with Python, Terraform, and required dependencies.
 - **docker-compose.yml**: Defines a development container for local use.
-- **SetupVenv.sh**: Script to set up a Python virtual environment and install development dependencies.
-- **LambdaSrc/**: Source code for Lambda functions.
-  - **DevEnvRequirements.txt**: Shared Python requirements for development.
-  - **Response/**: Lambda function for generating AI responses.
-    - `Index.py`: Main handler and logic for processing SQS messages and generating responses using Bedrock.
+- **setup_venv.sh**: Script to set up a Python virtual environment and install development dependencies.
+- **lambda_src/**: Source code for Lambda functions.
+  - **dev_env_requirements.txt**: Shared Python requirements for development.
+  - **response/**: Lambda function for generating AI responses.
+    - `index.py`: Main handler and logic for processing SQS messages and generating responses using Bedrock.
     - `requirements.txt`: Function-specific dependencies.
     - `test/`: Unit tests for the Response Lambda.
-  - **SpeechToText/**: Lambda function for transcribing audio.
-    - `Index.py`: Main handler and logic for transcribing audio and sending results to SQS.
+  - **speech_to_text/**: Lambda function for transcribing audio.
+    - `index.py`: Main handler and logic for transcribing audio and sending results to SQS.
     - `requirements.txt`: Function-specific dependencies.
     - `test/`: Unit tests for the SpeechToText Lambda.
 - **infrastructure/**: Terraform code for AWS infrastructure.
@@ -25,8 +25,8 @@ This repository contains the backend infrastructure and Lambda source code for t
 ## Main Components
 
 ### Lambda Functions
-- **SpeechToText**: Receives API requests, transcribes audio from S3, and sends transcription to SQS.
-- **Response**: Consumes SQS messages, generates AI responses using Bedrock, and stores results in DynamoDB or logs them.
+- **speech_to_text**: Receives API requests, transcribes audio from S3, and sends transcription to SQS.
+- **response**: Consumes SQS messages, generates AI responses using Bedrock, and stores results in DynamoDB or logs them.
 
 ### Infrastructure
 - **Terraform**: Provisions AWS Lambda (container image), SQS queue, and supporting resources. State is managed in S3.
@@ -38,7 +38,7 @@ This repository contains the backend infrastructure and Lambda source code for t
 2. **Set up AWS credentials** (ensure you have access to ECR, Lambda, SQS, S3, DynamoDB)
 3. **Build and deploy**:
    ```bash
-   ./Deploy.sh
+  ./deploy.sh
    ```
    This will:
    - Build and push Lambda images to ECR
@@ -46,7 +46,7 @@ This repository contains the backend infrastructure and Lambda source code for t
 
 4. **Local Development**:
    - Use `docker-compose up` to start a dev container
-   - Use `SetupVenv.sh` to set up a local Python environment
+  - Use `setup_venv.sh` to set up a local Python environment
 
 ## Testing
 - Each Lambda function has unit tests in its `test/` directory.

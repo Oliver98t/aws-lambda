@@ -9,14 +9,14 @@ venv/
 .env/
 
 # Ignore Lambda build outputs
-LambdaSrc/*/build/
+lambda_src/*/build/
 
 # Ignore Terraform state and backup files
 infrastructure/*.tfstate
 infrastructure/*.tfstate.backup
 
 # Ignore test outputs
-LambdaSrc/*/test/
+lambda_src/*/test/
 
 # Ignore OS files
 .DS_Store

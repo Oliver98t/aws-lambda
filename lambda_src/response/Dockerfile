@@ -1,9 +1,9 @@
-# Lambda Python 3.12 container for SpeechToText
+# Lambda Python 3.12 container for Response
 FROM public.ecr.aws/lambda/python:3.12
 
 
 # Copy function code and requirements to $LAMBDA_TASK_ROOT
-COPY Index.py requirements.txt ${LAMBDA_TASK_ROOT}/
+COPY index.py requirements.txt ${LAMBDA_TASK_ROOT}/
 
 # Install dependencies into $LAMBDA_TASK_ROOT
 RUN pip install --upgrade pip \
@@ -13,4 +13,4 @@ RUN pip install --upgrade pip \
 # COPY other_module.py ${LAMBDA_TASK_ROOT}/
 
 # Set the CMD to your handler (file.function)
-CMD ["Index.handler"]
+CMD ["index.handler"]

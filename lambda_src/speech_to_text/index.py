@@ -19,6 +19,7 @@ LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 S3_BUCKET = os.environ.get('S3_BUCKET', None)
 logger.info(f"S3 bucket: {S3_BUCKET}")
 
+
 def handler(event: dict, context):
     logger.info(f"Event: {event}")
     query_parameters: dict = event.get('queryStringParameters')
@@ -33,11 +34,12 @@ def handler(event: dict, context):
             MessageBody=json.dumps({
                 "user": user,
                 "transcription": transcription}))
-        
+
     return {
         'statusCode': 200,
         'body': json.dumps(f"transcription: {transcription}")
     }
+
 
 class Transcribe:
     def __init__(self, bucket, user):
@@ -53,13 +55,13 @@ class Transcribe:
             Media={'MediaFileUri': f"s3://{self.bucket}/{self.key}"},
             MediaFormat='flac',
             LanguageCode='en-GB',
-            OutputBucketName=self.bucket,          # where transcript JSON is saved
+            OutputBucketName=self.bucket,
             OutputKey=f"transcripts/{job_name}.json"
         )
 
         return job_name
-    
-    def get_transcription(self,job_name: str) -> str:
+
+    def get_transcription(self, job_name: str) -> str:
         """Poll until the job completes and return the transcript text."""
         while True:
             response = transcribe.get_transcription_job(TranscriptionJobName=job_name)
@@ -67,7 +69,6 @@ class Transcribe:
             status = job['TranscriptionJobStatus']
 
             if status == 'COMPLETED':
-                # Reconstruct the S3 key from the output location set in start_transcription
                 bucket = job['Transcript']['TranscriptFileUri'].split('/')[3]
                 s3_key = '/'.join(job['Transcript']['TranscriptFileUri'].split('/')[4:])
                 obj = s3.get_object(Bucket=bucket, Key=s3_key)

@@ -39,12 +39,12 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-# LambdaSrc build and test artifacts
-LambdaSrc/*/build/
-LambdaSrc/*/test/__pycache__/
-LambdaSrc/*/test/*.pyc
-LambdaSrc/*/test/*.pyo
-LambdaSrc/*/test/*.pyd
+# lambda_src build and test artifacts
+lambda_src/*/build/
+lambda_src/*/test/__pycache__/
+lambda_src/*/test/*.pyc
+lambda_src/*/test/*.pyo
+lambda_src/*/test/*.pyd
 
 # VS Code settings
 .vscode/

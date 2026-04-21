@@ -21,14 +21,14 @@ aws ecr get-login-password --region eu-west-2 | docker login --username AWS \
 
 # build/tag/push Response
 response_tag="response-$env:$commit"
-docker build -t $response_tag LambdaSrc/Response/
+docker build -t $response_tag lambda_src/response/
 response_image_uri="$registry_url/$response_tag"
 docker tag $response_tag $response_image_uri
 docker push $registry_url/$response_tag
 
 # build/tag/push SpeechToText
-speechtotext_tag="speechtotext-$env:$commit"
-docker build -t $speechtotext_tag LambdaSrc/SpeechToText/
+speechtotext_tag="speech_to_text-$env:$commit"
+docker build -t $speechtotext_tag lambda_src/speech_to_text/
 speechtotext_image_uri=$registry_url/$speechtotext_tag
 docker tag $speechtotext_tag $speechtotext_image_uri
 docker push $registry_url/$speechtotext_tag
@@ -42,7 +42,7 @@ terraform init -reconfigure \
 
 terraform apply $test \
     -var="environment=$env" \
-    -var="Response_image_uri=$response_image_uri" \
-    -var="SpeechToText_image_uri=$speechtotext_image_uri" \
+    -var="response_image_uri=$response_image_uri" \
+    -var="speech_to_text_image_uri=$speechtotext_image_uri" \
     -var="aws_region=$region"
 cd ..

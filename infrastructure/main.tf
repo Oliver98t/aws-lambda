@@ -1,17 +1,17 @@
 module "speech_to_text_lambda_function"  {
-  source = "./modules/SpeechToText"
+  source = "./modules/speech_to_text"
 
   aws_region                = var.aws_region
-  lambda_function_name      = "SpeechToText"
+  lambda_function_name      = "speech_to_text"
   environment               = var.environment
   application_name          = var.application_name
-  lambda_function_image_uri = var.SpeechToText_image_uri
+  lambda_function_image_uri = var.speech_to_text_image_uri
   queue_url                 = module.lambda_queue.queue_url
   queue_arn                 = module.lambda_queue.queue_arn
 }
 
 module "lambda_queue"  {
-  source = "./modules/Queue"
+  source = "./modules/queue"
 
   aws_region                = var.aws_region
   environment               = var.environment
@@ -19,12 +19,12 @@ module "lambda_queue"  {
 }
 
 module "response_lambda_function"  {
-  source = "./modules/Response"
+  source = "./modules/response"
 
   aws_region                = var.aws_region
-  lambda_function_name      = "Response"
+  lambda_function_name      = "response"
   environment               = var.environment
   application_name          = var.application_name
-  lambda_function_image_uri = var.Response_image_uri
+  lambda_function_image_uri = var.response_image_uri
   queue_arn                 = module.lambda_queue.queue_arn
 }

@@ -1,0 +1,4 @@
+pytest
+boto3
+requests
+mypy-boto3-bedrock-runtime==1.42.42

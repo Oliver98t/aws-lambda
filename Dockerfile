@@ -11,7 +11,7 @@ COPY ZscalerRootCertificate-2048-SHA256.crt /usr/local/share/ca-certificates/Zsc
 RUN update-ca-certificates
 
 # Install the specified packages
-RUN pip install -r LambdaSrc/DevEnvRequirements.txt
+RUN pip install -r lambda_src/dev_env_requirements.txt
 
 # set up git for version control
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*

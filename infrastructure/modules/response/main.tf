@@ -109,7 +109,7 @@ resource "aws_ecr_repository" "ECR" {
   name = "${lower(var.lambda_function_name)}-${var.environment}"
     force_delete = true
 }
-    
+
 # Lambda function
 resource "aws_lambda_function" "lambda_func" {
     function_name    = "${var.lambda_function_name}_${var.environment}"

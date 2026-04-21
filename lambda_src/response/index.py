@@ -13,6 +13,7 @@ logger.setLevel(logging.INFO)
 dynamo = boto3.client('dynamodb')
 LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 
+
 def handler(event, context):
     logger.info(f"Event: {event}")
     # get the message out of the SQS event
@@ -35,19 +36,20 @@ def handler(event, context):
             }
         )
     else:
-        return { "response": response }
+        return {"response": response}
+
 
 def generate_response(prompt: str):
-    client: BedrockRuntimeClient = boto3.client("bedrock-runtime", region_name="eu-west-2")  
+    client: BedrockRuntimeClient = boto3.client("bedrock-runtime", region_name="eu-west-2")
 
-    response = client.converse( 
-        modelId="global.amazon.nova-2-lite-v1:0", 
-        messages=[ 
-            { 
-                "role": "user", 
+    response = client.converse(
+        modelId="global.amazon.nova-2-lite-v1:0",
+        messages=[
+            {
+                "role": "user",
                 "content": [{"text": prompt}]
-            } 
-        ] 
-    )  
+            }
+        ]
+    )
 
     return response["output"]["message"]["content"][0]["text"]
