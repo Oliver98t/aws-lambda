@@ -25,19 +25,21 @@ commit=$(git rev-parse --short HEAD)
 aws ecr get-login-password --region eu-west-2 | docker login --username AWS \
 --password-stdin $registry_url
 
-# build/tag/push Response
-response_tag="response_$env:$commit"
-docker build -t $response_tag lambda_src/response/
-response_image_uri="$registry_url/$response_tag"
-docker tag $response_tag $response_image_uri
-docker push $registry_url/$response_tag
+build_tag_push()
+{
+    src=$1
+    docker_repo=$2
+    tag="${docker_repo}${env}:${commit}"
+    echo "Building $tag from $src" >&2
+    docker build -t $tag $src >&2
+    image_uri="$registry_url/$tag"
+    docker tag $tag $image_uri >&2
+    docker push $registry_url/$tag >&2
+    echo "$image_uri"
+}
 
-# build/tag/push SpeechToText
-speechtotext_tag="speech_to_text_$env:$commit"
-docker build -t $speechtotext_tag lambda_src/speech_to_text/
-speechtotext_image_uri=$registry_url/$speechtotext_tag
-docker tag $speechtotext_tag $speechtotext_image_uri
-docker push $registry_url/$speechtotext_tag
+response_image_uri=$(build_tag_push "lambda_src/response/" "response_")
+speechtotext_image_uri=$(build_tag_push "lambda_src/speech_to_text/" "speech_to_text_") 
 
 cd infrastructure
 terraform init -reconfigure \
