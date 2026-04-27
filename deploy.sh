@@ -24,23 +24,24 @@ commit=$(git rev-parse --short HEAD)
 
 aws ecr get-login-password --region eu-west-2 | docker login --username AWS \
 --password-stdin $registry_url
-
+# TODO add tag delete
 build_tag_push()
 {
     src=$1
     docker_repo=$2
-    tag="${docker_repo}${env}:${commit}"
+    tag="${docker_repo}:${commit}"
     echo "Building $tag from $src" >&2
     docker build -t $tag $src >&2
+    #aws ecr batch-delete-image --repository-name $docker_repo --image-ids imageTag=$commit
     image_uri="$registry_url/$tag"
     docker tag $tag $image_uri >&2
     docker push $registry_url/$tag >&2
     echo "$image_uri"
 }
 
-get_response_image_uri=$(build_tag_push "lambda_src/get_response/" "get_response_")
-response_image_uri=$(build_tag_push "lambda_src/response/" "response_")
-speechtotext_image_uri=$(build_tag_push "lambda_src/speech_to_text/" "speech_to_text_") 
+get_response_image_uri=$(build_tag_push "lambda_src/get_response/" "get_response_$env")
+response_image_uri=$(build_tag_push "lambda_src/response/" "response_$env")
+speechtotext_image_uri=$(build_tag_push "lambda_src/speech_to_text/" "speech_to_text_$env") 
 
 cd infrastructure
 terraform init -reconfigure \

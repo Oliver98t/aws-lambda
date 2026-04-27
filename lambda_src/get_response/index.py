@@ -14,4 +14,9 @@ dynamo = boto3.client('dynamodb')
 
 def handler(event, context):
     logger.info(f"Event: {event}")
+
+    return {
+        'statusCode': 200,
+        'body': "testing"
+    }
     

@@ -17,10 +17,11 @@ sqs: SQSClient = boto3.client('sqs')
 # set up env variables
 LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 S3_BUCKET = os.environ.get('S3_BUCKET', None)
-logger.info(f"S3 bucket: {S3_BUCKET}")
-
 
 def handler(event: dict, context):
+    logger.info("Handler called")
+    logger.info(f"LOCAL_TEST: {LOCAL_TEST}")
+    logger.info(f"S3_BUCKET: {S3_BUCKET}")
     logger.info(f"Event: {event}")
     query_parameters: dict = event.get('queryStringParameters')
     user = query_parameters.get("user")
