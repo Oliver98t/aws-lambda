@@ -27,18 +27,20 @@ def handler(event: dict, context):
     user = query_parameters.get("user")
     transcribe = Transcribe(bucket=S3_BUCKET, user=user)
     transcription = transcribe.transcribe()
-
+    job_id = str(uuid.uuid4())
     if LOCAL_TEST != None:
         sqs.send_message(
             QueueUrl=QUEUE_URL,
             MessageBody=json.dumps({
-                "jobId": str(uuid.uuid4()),
+                "jobId": job_id,
                 "user": user,
                 "transcription": transcription}))
 
     return {
         'statusCode': 200,
-        'body': json.dumps(f"transcription: {transcription}")
+        'body': json.dumps({
+            "jobId": job_id,
+            "transcription": transcription})
     }
 
 
