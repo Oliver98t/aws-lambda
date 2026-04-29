@@ -50,4 +50,5 @@ module "get_response_lambda_function" {
     lambda_function_image_uri   = var.get_response_image_uri
     dynamodb_table_arn          = module.storage.dynamodb_table_arn
     dynamodb_table_name         = module.storage.dynamodb_table_name
+    local_test                  = var.local_test
 }

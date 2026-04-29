@@ -64,6 +64,7 @@ resource "aws_lambda_function" "lambda_func" {
       ENVIRONMENT     = var.environment
       LOG_LEVEL       = var.log_level
       DYNAMODB_TABLE  = var.dynamodb_table_name
+      LOCAL_TEST      = var.local_test
     }
   }
 
