@@ -1,9 +1,7 @@
 import boto3
-import datetime
 import os
 import json
-import uuid
-from mypy_boto3_bedrock_runtime import BedrockRuntimeClient
+
 
 import logging
 logger = logging.getLogger()
@@ -22,18 +20,20 @@ def handler(event, context):
     query_parameters: dict = event.get('queryStringParameters')
     jobId = query_parameters.get("jobId")
     logger.info(jobId)
-    
+
     if LOCAL_TEST != None:
         # Get a single item by primary key
         response = table.get_item(
             Key={'id': jobId}
         )
         logger.info(response)
-        item = response.get('response')
-        logger.info(item)
-
+        item = response.get('Item')
+        response = item.get('response')
+        
     return {
         'statusCode': 200,
-        'response': "testing"
+        'body': json.dumps({
+            "response": response
+        })
     }
     
