@@ -14,7 +14,7 @@ LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', None)
 
 # create the DynamoDB resource
-dynamo = boto3.client('dynamodb')
+dynamo = boto3.resource('dynamodb')
 table = dynamo.Table(DYNAMODB_TABLE)
 
 def handler(event, context):
@@ -32,6 +32,6 @@ def handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': "testing"
+        'response': "testing"
     }
     
