@@ -14,15 +14,15 @@ dynamo = boto3.client('dynamodb')
 LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 TABLENAME = os.environ.get('TABLE_NAME')
 
-#TODO modify to be triggered by sqs OR url endpoint
-
 def handler(event, context):
     logger.info(f"LOCAL_TEST: {LOCAL_TEST}")
     logger.info(f"Event: {event}")
 
     if event.get('Records'):
+        logger.info("SQS trigger")
         data = sqs_event(event)
     elif event.get('version'):
+        logger.info("url trigger")
         data = url_event(event)
 
     return data
