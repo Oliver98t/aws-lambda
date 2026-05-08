@@ -1,10 +1,18 @@
+"""Unit tests for the speech_to_text Lambda function.
+
+These tests call AWS Transcribe and require valid AWS credentials and a
+pre-uploaded test audio file at s3://ainterviewupload/uploads/test.flac.
+"""
+
 import lambda_src.speech_to_text.index as stt
 from lambda_src.speech_to_text.index import Transcribe, handler
 import json
 
 def test_transcribe():
+    """Test that the Transcribe class submits a job and returns the expected transcript."""
     transcribe = Transcribe(bucket="ainterviewupload", user="test")
     transcription = transcribe.transcribe()
+    # expected transcript text from the test audio file
     test_trasncription = "Give me a series of Python interview questions."
     assert transcription == test_trasncription
 
@@ -62,8 +70,14 @@ event_test_data = {
 }
 
 def test_handler(monkeypatch):
+    """Test the Lambda handler end-to-end with a realistic URL-invocation event.
+
+    Monkeypatches S3_BUCKET so the handler targets the real test bucket without
+    relying on environment variables being set locally.
+    """
     monkeypatch.setattr(stt, "S3_BUCKET", "ainterviewupload")
     result = handler(event=event_test_data, context=None)
     body = json.loads(result['body'])
+    # verify the HTTP response shape and transcript content
     assert result['statusCode'] == 200
     assert body['transcription'] == "Give me a series of Python interview questions."

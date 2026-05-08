@@ -1,8 +1,16 @@
+"""Unit tests for the response Lambda function.
+
+Tests cover the Bedrock response generation helper as well as the Lambda
+handler for both SQS-triggered and direct URL-invocation paths.
+"""
+
 from lambda_src.response.index import generate_response, handler
 
 def test_generate_response():
+    """Test that generate_response returns a non-empty string for any prompt."""
     prompt: str = "this is a test prompt"
     response = generate_response(prompt)
+    # the model should always return a string regardless of prompt content
     assert type(response) == str
 
 sqs_event_test_data = {
@@ -28,6 +36,11 @@ sqs_event_test_data = {
 }
 
 def test_sqs_event_handler():
+    """Test the handler when invoked via an SQS trigger.
+
+    The handler should process the SQS record body and return the
+    generated response string directly.
+    """
     result = handler(event=sqs_event_test_data, context=None)
     print(result)
     assert type(result) == str
@@ -85,6 +98,11 @@ url_call_event_test_data = {
 }
 
 def test_url_event_handler():
+    """Test the handler when invoked via a Lambda function URL.
+
+    The handler should return a dict with a 'statusCode' and 'body' key
+    matching the standard HTTP response shape.
+    """
     result = handler(event=url_call_event_test_data, context=None)
     print(result)
     assert type(result) == dict
