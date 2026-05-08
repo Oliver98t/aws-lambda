@@ -64,6 +64,6 @@ This repository contains the backend infrastructure and Lambda source code for t
 
 ---
 
-#TODO - add endpoint to get response result
+TODO add history section to response (sliding window of 10)
 
 For more details, see the code in each subdirectory and the Terraform module documentation.
