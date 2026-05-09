@@ -91,6 +91,8 @@ def url_event(event) -> dict:
         user = query_parameters.get("user")
         transcript = query_parameters.get("transcript")
         # generate an AI response for the provided transcript
+        history = read_db(user_value=user)
+        logger.info(f"history {history}")
         response = generate_response(transcript)
 
         write_to_db({"user": user, 
@@ -108,6 +110,14 @@ def url_event(event) -> dict:
         'body': body
     }
 
+def read_db(user_value: str):
+    response = dynamo.query(
+            TableName=TABLENAME,
+            KeyConditionExpression='user = :u',
+            ExpressionAttributeValues={':u': {'S': user_value}}
+        )
+    return response.get('Items', [])
+
 def write_to_db(data: dict):
     """Persist the response data to DynamoDB.
 
@@ -124,11 +134,11 @@ def write_to_db(data: dict):
         dynamo.put_item(
             TableName=TABLENAME,
             Item={
-                'id': {'S': str(data['job_id'])},
-                'user': {'S': str(data['user'])},
-                'timestamp': {'S': datetime.datetime.now().isoformat()},
-                'transcript': {'S': str(data['transcript'])},
-                'response': {'S': str(data['response'])}
+                'id':           {'S': str(data['job_id'])},
+                'user':         {'S': str(data['user'])},
+                'timestamp':    {'S': datetime.datetime.now().isoformat()},
+                'transcript':   {'S': str(data['transcript'])},
+                'response':     {'S': str(data['response'])}
             }
         )
     return result
