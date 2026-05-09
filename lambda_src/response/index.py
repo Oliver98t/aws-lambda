@@ -125,6 +125,7 @@ def write_to_db(data: dict):
             TableName=TABLENAME,
             Item={
                 'id': {'S': str(data['job_id'])},
+                'user': {'S': str(data['user'])},
                 'timestamp': {'S': datetime.datetime.now().isoformat()},
                 'transcript': {'S': str(data['transcript'])},
                 'response': {'S': str(data['response'])}
