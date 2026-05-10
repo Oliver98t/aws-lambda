@@ -112,16 +112,18 @@ def url_event(event) -> dict:
     }
 
 def read_db(user_value: str):
+    response = None
     try:
         response = dynamo.query(
                 TableName=TABLENAME,
                 KeyConditionExpression='user_name = :u',
                 ExpressionAttributeValues={':u': {'S': user_value}}
             )
+        response.get('Items', [])
     except Exception as e:
         logger.error(f"Exception: {e}")
-        
-    return response.get('Items', [])
+
+    return response
 
 def write_to_db(data: dict):
     """Persist the response data to DynamoDB.
