@@ -3,19 +3,19 @@
 # Calls Amazon Bedrock to generate an AI response for a given transcript,
 # then persists the result to DynamoDB.
 
-from boto3 import client, dynamodb
+import boto3
 import datetime
 import os
 import json
 import uuid
+from mypy_boto3_dynamodb import DynamoDBServiceResource
 from mypy_boto3_bedrock_runtime import BedrockRuntimeClient
 
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# create the DynamoDB resource
-dynamo = client('dynamodb')
+ddb_resource: DynamoDBServiceResource = boto3.resource('dynamodb')
 LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 TABLENAME = os.environ.get('TABLE_NAME')
 
@@ -114,10 +114,10 @@ def url_event(event) -> dict:
 def read_db(user_value: str):
     response = None
     try:
-        response = dynamo.scan(
-                TableName=TABLENAME,
-                FilterExpression=dynamodb.conditions.Attr('user_name').eq(user_value)
-            )
+        table = ddb_resource.Table(TABLENAME)
+        response = table.scan(
+            FilterExpression=boto3.dynamodb.conditions.Attr('user_name').eq(user_value)
+        )
         response.get('Items', [])
     except Exception as e:
         logger.error(f"Exception: {e}")
@@ -137,14 +137,14 @@ def write_to_db(data: dict):
     # only write to DynamoDB when running in a live environment (not local tests)
     if LOCAL_TEST != None:
         logger.info("writing to dynamodb")
-        dynamo.put_item(
-            TableName=TABLENAME,
+        table = ddb_resource.Table(TABLENAME)
+        table.put_item(
             Item={
-                'id':           {'S': str(data['job_id'])},
-                'user_name':    {'S': str(data['user_name'])},
-                'timestamp':    {'S': datetime.datetime.now().isoformat()},
-                'transcript':   {'S': str(data['transcript'])},
-                'response':     {'S': str(data['response'])}
+                'id':           str(data['job_id']),
+                'user_name':    str(data['user_name']),
+                'timestamp':    datetime.datetime.now().isoformat(),
+                'transcript':   str(data['transcript']),
+                'response':     str(data['response'])
             }
         )
     return result
@@ -158,8 +158,8 @@ def generate_response(prompt: str):
     Returns:
         The generated response text as a string.
     """
-    # initialise the Bedrock runtime client for the eu-west-2 region
-    bedrock: BedrockRuntimeClient = client("bedrock-runtime", region_name="eu-west-2")
+    # Bedrock currently only supports the client API in boto3, not resource API.
+    bedrock: BedrockRuntimeClient = boto3.client("bedrock-runtime", region_name="eu-west-2")
 
     # send the transcript to the model and retrieve the generated text
     response = bedrock.converse(
