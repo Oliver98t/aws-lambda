@@ -3,7 +3,7 @@
 # Calls Amazon Bedrock to generate an AI response for a given transcript,
 # then persists the result to DynamoDB.
 
-import boto3
+from boto3 import client, dynamodb
 import datetime
 import os
 import json
@@ -15,7 +15,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # create the DynamoDB resource
-dynamo = boto3.client('dynamodb')
+dynamo = client('dynamodb')
 LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 TABLENAME = os.environ.get('TABLE_NAME')
 
@@ -114,10 +114,9 @@ def url_event(event) -> dict:
 def read_db(user_value: str):
     response = None
     try:
-        response = dynamo.query(
+        response = dynamo.scan(
                 TableName=TABLENAME,
-                KeyConditionExpression='user_name = :u',
-                ExpressionAttributeValues={':u': {'S': user_value}}
+                FilterExpression=dynamodb.conditions.Attr('user_name').eq(user_value)
             )
         response.get('Items', [])
     except Exception as e:
@@ -160,10 +159,10 @@ def generate_response(prompt: str):
         The generated response text as a string.
     """
     # initialise the Bedrock runtime client for the eu-west-2 region
-    client: BedrockRuntimeClient = boto3.client("bedrock-runtime", region_name="eu-west-2")
+    bedrock: BedrockRuntimeClient = client("bedrock-runtime", region_name="eu-west-2")
 
     # send the transcript to the model and retrieve the generated text
-    response = client.converse(
+    response = bedrock.converse(
         modelId="global.amazon.nova-2-lite-v1:0",
         messages=[
             {
