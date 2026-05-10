@@ -88,17 +88,17 @@ def url_event(event) -> dict:
     try:
         query_parameters: dict = event.get('queryStringParameters')
         job_id = str(uuid.uuid4())
-        user = query_parameters.get("user")
+        user_name = query_parameters.get("user_name")
         transcript = query_parameters.get("transcript")
         # generate an AI response for the provided transcript
-        history = read_db(user_value=user)
+        history = read_db(user_value=user_name)
         logger.info(f"history {history}")
         response = generate_response(transcript)
 
-        write_to_db({"user": user, 
-                    "transcript": transcript,
-                    "response": response, 
-                    "job_id": job_id})
+        write_to_db({"user_name":   user_name, 
+                    "transcript":   transcript,
+                    "response":     response, 
+                    "job_id":       job_id})
         
         status_code = 200
         body = json.dumps({"jobId": job_id, "response": response})
@@ -114,7 +114,7 @@ def url_event(event) -> dict:
 def read_db(user_value: str):
     response = dynamo.query(
             TableName=TABLENAME,
-            KeyConditionExpression='user = :u',
+            KeyConditionExpression='user_name = :u',
             ExpressionAttributeValues={':u': {'S': user_value}}
         )
     return response.get('Items', [])
@@ -136,7 +136,7 @@ def write_to_db(data: dict):
             TableName=TABLENAME,
             Item={
                 'id':           {'S': str(data['job_id'])},
-                'user':         {'S': str(data['user'])},
+                'user_name':    {'S': str(data['user_name'])},
                 'timestamp':    {'S': datetime.datetime.now().isoformat()},
                 'transcript':   {'S': str(data['transcript'])},
                 'response':     {'S': str(data['response'])}
