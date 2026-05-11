@@ -155,16 +155,19 @@ def create_message_history(history: dict)-> list:
     message_history = []
     for item in items:
         response: dict = json.loads(item.get('response'))
-        message_history.append(
-            {
-                "role": "user",
-                "content": [{"text": response.get('answer')}]
-            })
-        message_history.append(
-            {
-                "role": "assistant",
-                "content": [{"text": response.get('question')}]
-            })
+        answer = response.get('answer')
+        question = response.get('question')
+        if answer != None and question != None:
+            message_history.append(
+                {
+                    "role": "user",
+                    "content": [{"text": response.get('answer')}]
+                })
+            message_history.append(
+                {
+                    "role": "assistant",
+                    "content": [{"text": response.get('question')}]
+                })
     return message_history
 
 def generate_response(prompt: str, user_name: str):
