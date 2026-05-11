@@ -60,13 +60,13 @@ def sqs_event(event):
     data: dict = json.loads(message)
     # extract fields from the SQS message payload
     job_id = data.get('jobId')
-    user = data.get('user')
+    user_name = data.get('user_name')
     transcript = data.get('transcription')
     # generate an AI response for the transcript
-    response = generate_response(prompt=transcript, user_name=user)
+    response = generate_response(prompt=transcript, user_name=user_name)
 
     # write event data to DDB table
-    result = write_to_db({"user": user, 
+    result = write_to_db({"user": user_name, 
                           "transcript": transcript,
                           "response": response, 
                           "job_id": job_id})
@@ -92,7 +92,7 @@ def url_event(event) -> dict:
         transcript = query_parameters.get("transcript")
         # generate an AI response for the provided transcript
 
-        response = generate_response(transcript)
+        response = generate_response(prompt=transcript, user_name=user_name)
 
         write_to_db({"user_name":   user_name, 
                     "transcript":   transcript,
