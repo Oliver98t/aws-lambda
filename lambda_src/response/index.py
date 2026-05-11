@@ -181,9 +181,10 @@ def generate_response(prompt: str, user_name: str):
     history = read_db(user_value=user_name)
     message_history = create_message_history(history=history)
     messages = message_history
+    logger.info(f"history {history}")
     messages.append({"role": "user",
                      "content": [{"text": prompt}]})
-    logger.info(f"history {messages}")
+    logger.info(f"messages {messages}")
     # send the transcript to the model and retrieve the generated text
     response = bedrock.converse(
         modelId="global.amazon.nova-2-lite-v1:0",
