@@ -179,11 +179,11 @@ def generate_response(prompt: str, user_name: str):
     # Bedrock currently only supports the client API in boto3, not resource API.
     bedrock: BedrockRuntimeClient = boto3.client("bedrock-runtime", region_name="eu-west-2")
     history = read_db(user_value=user_name)
-    logger.info(f"history {history}")
     message_history = create_message_history(history=history)
     messages = message_history
     messages.append({"role": "user",
                      "content": [{"text": prompt}]})
+    logger.info(f"history {messages}")
     # send the transcript to the model and retrieve the generated text
     response = bedrock.converse(
         modelId="global.amazon.nova-2-lite-v1:0",
