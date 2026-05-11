@@ -63,7 +63,7 @@ def sqs_event(event):
     user = data.get('user')
     transcript = data.get('transcription')
     # generate an AI response for the transcript
-    response = generate_response(transcript)
+    response = generate_response(prompt=transcript, user_name=user)
 
     # write event data to DDB table
     result = write_to_db({"user": user, 
@@ -91,8 +91,7 @@ def url_event(event) -> dict:
         user_name = query_parameters.get("user_name")
         transcript = query_parameters.get("transcript")
         # generate an AI response for the provided transcript
-        history = read_db(user_value=user_name)
-        logger.info(f"history {history}")
+
         response = generate_response(transcript)
 
         write_to_db({"user_name":   user_name, 
@@ -149,7 +148,26 @@ def write_to_db(data: dict):
         )
     return result
 
-def generate_response(prompt: str):
+# TODO create a history function
+def create_message_history(history: dict)-> list:
+    items = history.get('Items')
+    items_num = len(items)
+    message_history = []
+    for item in items:
+        response: dict = json.loads(item.get('response'))
+        message_history.append(
+            {
+                "role": "user",
+                "content": [{"text": response.get('answer')}]
+            })
+        message_history.append(
+            {
+                "role": "assistant",
+                "content": [{"text": response.get('question')}]
+            })
+    return message_history
+
+def generate_response(prompt: str, user_name: str):
     """Send a prompt to Amazon Bedrock and return the model's text response.
 
     Args:
@@ -160,16 +178,16 @@ def generate_response(prompt: str):
     """
     # Bedrock currently only supports the client API in boto3, not resource API.
     bedrock: BedrockRuntimeClient = boto3.client("bedrock-runtime", region_name="eu-west-2")
-
+    history = read_db(user_value=user_name)
+    logger.info(f"history {history}")
+    message_history = create_message_history(history=history)
+    messages = message_history
+    messages.append({"role": "user",
+                     "content": [{"text": prompt}]})
     # send the transcript to the model and retrieve the generated text
     response = bedrock.converse(
         modelId="global.amazon.nova-2-lite-v1:0",
-        messages=[
-            {
-                "role": "user",
-                "content": [{"text": prompt}]
-            }
-        ]
+        messages=messages
     )
 
     return response["output"]["message"]["content"][0]["text"]
