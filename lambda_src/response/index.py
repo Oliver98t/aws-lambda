@@ -91,7 +91,6 @@ def url_event(event) -> dict:
         user_name = query_parameters.get("user_name")
         transcript = query_parameters.get("transcript")
         # generate an AI response for the provided transcript
-
         response = generate_response(prompt=transcript, user_name=user_name)
 
         write_to_db({"user_name":   user_name, 
@@ -182,9 +181,12 @@ def generate_response(prompt: str, user_name: str):
     # Bedrock currently only supports the client API in boto3, not resource API.
     bedrock: BedrockRuntimeClient = boto3.client("bedrock-runtime", region_name="eu-west-2")
     history = read_db(user_value=user_name)
+    logger.info(f"history {history}")
+    
     message_history = create_message_history(history=history)
     messages = message_history
-    logger.info(f"history {history}")
+    logger.info(f"message_history {messages}")
+    
     messages.append({"role": "user",
                      "content": [{"text": prompt}]})
     logger.info(f"messages {messages}")
