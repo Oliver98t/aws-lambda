@@ -12,6 +12,11 @@ resource "aws_dynamodb_table" "response_table" {
         type = "S"
     }
 
+    attribute {
+        name = "timestamp"
+        type = "N"
+    }
+
     tags = {
         Environment = var.environment
         Application = var.application_name

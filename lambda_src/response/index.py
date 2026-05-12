@@ -11,6 +11,7 @@ import json
 import uuid
 from mypy_boto3_dynamodb import DynamoDBServiceResource
 from mypy_boto3_bedrock_runtime import BedrockRuntimeClient
+from boto3.dynamodb.conditions import Key
 
 import logging
 logger = logging.getLogger()
@@ -114,12 +115,14 @@ def read_db(user_value: str):
     response = None
     try:
         table = ddb_resource.Table(TABLENAME)
-        response = table.scan(
-            FilterExpression=boto3.dynamodb.conditions.Attr('user_name').eq(user_value)
+        # Use query instead of scan, assuming user_name is the partition key and timestamp is the sort key
+        response = table.query(
+            KeyConditionExpression=Key('user_name').eq(user_value),
+            ScanIndexForward=False  # Descending order (newest first)
         )
-        response.get('Items', [])
     except Exception as e:
         logger.error(f"Exception: {e}")
+        response = {"Items": []}
 
     return response
 
