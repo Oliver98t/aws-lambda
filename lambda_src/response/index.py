@@ -5,6 +5,7 @@
 
 import boto3
 import datetime
+import time
 import os
 import json
 import uuid
@@ -140,7 +141,8 @@ def write_to_db(data: dict):
             Item={
                 'id':           str(data['job_id']),
                 'user_name':    str(data['user_name']),
-                'timestamp':    datetime.datetime.now().isoformat(),
+                'timestamp':    int(time.time()),
+                'date':         datetime.datetime.now().isoformat(),
                 'transcript':   str(data['transcript']),
                 'response':     str(data['response'])
             }
