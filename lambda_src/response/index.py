@@ -180,7 +180,7 @@ def create_message_history(history: dict)-> list:
             message_history.append(
                 {
                     "role": "user",
-                    "content": [{"text": item.get('transcript')}]
+                    "content": [{"text": str(item.get('transcript'))}]
                 })
             message_history.append(
                 {
