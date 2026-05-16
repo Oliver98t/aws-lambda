@@ -176,16 +176,17 @@ def create_message_history(history: dict)-> list:
     for item in items:
         try:
             response: dict = json.loads(item.get('response'))
-            answer = response.get('answer', None)
-            question = response.get('question', None)
-            score = response.get('score', None)
-            reason = response.get('reason', None)
-            if answer != None and question != None:
-                message_history.append(
-                    {
-                        "role": "assistant",
-                        "content": [{"text": str(response)}]
-                    })
+
+            message_history.append(
+                {
+                    "role": "user",
+                    "content": [{"text": item.get('transcript')}]
+                })
+            message_history.append(
+                {
+                    "role": "assistant",
+                    "content": [{"text": str(response)}]
+                })
             # TODO add score and reason logic
         except Exception as error:
             logger.error(error)
