@@ -142,10 +142,10 @@ def write_to_db(data: dict):
         table = ddb_resource.Table(TABLENAME)
         table.put_item(
             Item={
-                'id':           str(data['job_id']),
                 'user_name':    str(data['user_name']),
                 'timestamp':    int(time.time()),
                 'date':         datetime.datetime.now().isoformat(),
+                'job_id':       str(data['job_id']),
                 'transcript':   str(data['transcript']),
                 'response':     str(data['response'])
             }

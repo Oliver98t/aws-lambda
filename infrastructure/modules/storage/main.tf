@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_dynamodb_table" "response_table" {
     name         = "${lower(var.application_name)}-response-${var.environment}"
     billing_mode = "PAY_PER_REQUEST"
-    hash_key     = "id"
+    hash_key     = "user_name"
     range_key    = "timestamp"
 
     attribute {
