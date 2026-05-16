@@ -21,6 +21,8 @@ ddb_resource: DynamoDBServiceResource = boto3.resource('dynamodb')
 LOCAL_TEST = os.environ.get('LOCAL_TEST', None)
 TABLENAME = os.environ.get('TABLE_NAME')
 
+CHAT_WINDOW = 10
+
 def handler(event, context):
     """Lambda entry point. Routes to the correct handler based on the event source.
 
@@ -124,6 +126,20 @@ def read_db(user_value: str):
         logger.error(f"Exception: {e}")
         response = {"Items": []}
 
+    if len(response['Items']) > CHAT_WINDOW:
+        # delete db contents greater
+        items = response.get('Items', [])
+        # Keep only the newest 'keep_n' items, delete the rest
+        to_delete = items[CHAT_WINDOW:]
+        with table.batch_writer() as batch:
+            for item in to_delete:
+                batch.delete_item(
+                    Key={
+                        'user_name': item['user_name'],
+                        'timestamp': item['timestamp']
+                    }
+                )
+    
     return response
 
 def write_to_db(data: dict):
@@ -175,7 +191,7 @@ def create_message_history(history: dict)-> list:
                         "role": "assistant",
                         "content": [{"text": response.get('question')}]
                     })
-            # TODO add scor and reason logic
+            # TODO add score and reason logic
         except Exception as error:
             logger.error(error)
 
