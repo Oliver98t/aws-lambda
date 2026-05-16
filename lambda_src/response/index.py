@@ -196,7 +196,7 @@ def generate_response(prompt: str, user_name: str):
     logger.info(f"history {history}")
     
     message_history = create_message_history(history=history)
-    logger.info(f"message_history {message_history}")
+    logger.info(f"message_history {len(message_history)} {message_history}")
     messages = []#message_history
     
     messages.append({"role": "user",
