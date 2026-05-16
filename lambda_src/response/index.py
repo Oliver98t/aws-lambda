@@ -126,7 +126,7 @@ def read_db(user_value: str):
         logger.error(f"Exception: {e}")
         response = {"Items": []}
 
-    if len(response['Items']) > CHAT_WINDOW:
+    if len(response['Items']) >= CHAT_WINDOW:
         # delete db contents greater
         items = response.get('Items', [])
         # Keep only the newest 'keep_n' items, delete the rest
@@ -183,13 +183,8 @@ def create_message_history(history: dict)-> list:
             if answer != None and question != None:
                 message_history.append(
                     {
-                        "role": "user",
-                        "content": [{"text": response.get('answer')}]
-                    })
-                message_history.append(
-                    {
                         "role": "assistant",
-                        "content": [{"text": response.get('question')}]
+                        "content": [{"text": str(response)}]
                     })
             # TODO add score and reason logic
         except Exception as error:
@@ -213,7 +208,7 @@ def generate_response(prompt: str, user_name: str):
     
     message_history = create_message_history(history=history)
     logger.info(f"message_history {len(message_history)} {message_history}")
-    messages = []#message_history
+    messages = message_history
     
     messages.append({"role": "user",
                      "content": [{"text": prompt}]})
