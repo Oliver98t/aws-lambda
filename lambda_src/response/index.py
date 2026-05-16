@@ -209,7 +209,7 @@ def generate_response(prompt: str, user_name: str):
     # Bedrock currently only supports the client API in boto3, not resource API.
     bedrock: BedrockRuntimeClient = boto3.client("bedrock-runtime", region_name="eu-west-2")
     history = read_db(user_value=user_name)
-    logger.info(f"history {history}")
+    logger.info(f"history {len(history)} {history}")
     
     message_history = create_message_history(history=history)
     logger.info(f"message_history {len(message_history)} {message_history}")
