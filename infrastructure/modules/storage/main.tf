@@ -9,7 +9,7 @@ resource "aws_dynamodb_table" "response_table" {
     range_key    = "timestamp"
 
     attribute {
-        name = "id"
+        name = "user_name"
         type = "S"
     }
 

@@ -158,20 +158,27 @@ def create_message_history(history: dict)-> list:
     items_num = len(items)
     message_history = []
     for item in items:
-        response: dict = json.loads(item.get('response'))
-        answer = response.get('answer')
-        question = response.get('question')
-        if answer != None and question != None:
-            message_history.append(
-                {
-                    "role": "user",
-                    "content": [{"text": response.get('answer')}]
-                })
-            message_history.append(
-                {
-                    "role": "assistant",
-                    "content": [{"text": response.get('question')}]
-                })
+        try:
+            response: dict = json.loads(item.get('response'))
+            answer = response.get('answer', None)
+            question = response.get('question', None)
+            score = response.get('score', None)
+            reason = response.get('reason', None)
+            if answer != None and question != None:
+                message_history.append(
+                    {
+                        "role": "user",
+                        "content": [{"text": response.get('answer')}]
+                    })
+                message_history.append(
+                    {
+                        "role": "assistant",
+                        "content": [{"text": response.get('question')}]
+                    })
+            # TODO add scor and reason logic
+        except Exception as error:
+            logger.error(error)
+
     return message_history
 
 def generate_response(prompt: str, user_name: str):
@@ -188,10 +195,10 @@ def generate_response(prompt: str, user_name: str):
     history = read_db(user_value=user_name)
     logger.info(f"history {history}")
     
-    #message_history = create_message_history(history=history)
+    message_history = create_message_history(history=history)
     #messages = message_history
     messages = []
-    #logger.info(f"message_history {messages}")
+    logger.info(f"message_history {messages}")
     
     messages.append({"role": "user",
                      "content": [{"text": prompt}]})
