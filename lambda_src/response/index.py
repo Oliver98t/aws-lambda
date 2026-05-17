@@ -170,8 +170,8 @@ def write_to_db(data: dict):
                 'timestamp':    int(time.time()),
                 'date':         datetime.datetime.now().isoformat(),
                 'job_id':       str(data['job_id']),
-                'transcript':   str(data['transcript']),
-                'response':     str(data['response'])
+                'response':     str(data['response']),
+                'type':         str(data['type'])          
             }
         )
     return result
